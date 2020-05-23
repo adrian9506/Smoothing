@@ -1,0 +1,12 @@
+C:\Users\Adrian\source\repos\Smoothing\DataSmoothing\DataSmoothing\bin\Debug\DataSmoothing.exe.config
+C:\Users\Adrian\source\repos\Smoothing\DataSmoothing\DataSmoothing\bin\Debug\DataSmoothing.exe
+C:\Users\Adrian\source\repos\Smoothing\DataSmoothing\DataSmoothing\bin\Debug\DataSmoothing.pdb
+C:\Users\Adrian\source\repos\Smoothing\DataSmoothing\DataSmoothing\obj\Debug\DataSmoothing.csprojAssemblyReference.cache
+C:\Users\Adrian\source\repos\Smoothing\DataSmoothing\DataSmoothing\obj\Debug\DataSmoothing.Properties.Resources.resources
+C:\Users\Adrian\source\repos\Smoothing\DataSmoothing\DataSmoothing\obj\Debug\DataSmoothing.csproj.GenerateResource.cache
+C:\Users\Adrian\source\repos\Smoothing\DataSmoothing\DataSmoothing\obj\Debug\DataSmoothing.csproj.CoreCompileInputs.cache
+C:\Users\Adrian\source\repos\Smoothing\DataSmoothing\DataSmoothing\obj\Debug\DataSmoothing.exe
+C:\Users\Adrian\source\repos\Smoothing\DataSmoothing\DataSmoothing\obj\Debug\DataSmoothing.pdb
+C:\Users\Adrian\source\repos\Smoothing\DataSmoothing\DataSmoothing\obj\Debug\DataSmoothing.DataChart.resources
+C:\Users\Adrian\source\repos\Smoothing\DataSmoothing\DataSmoothing\obj\Debug\DataSmoothing.Forms.AddSeries.SeriesAddForm.resources
+C:\Users\Adrian\source\repos\Smoothing\DataSmoothing\DataSmoothing\obj\Debug\DataSmoothing.Forms.AddSeries.ColumnNameEditor.resources
