@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -32,6 +33,11 @@ namespace DataSmoothing.Forms.AddSeries
         }
 
         /// <summary>
+        /// Przechowuje wybrane zmienne
+        /// </summary>
+        public DataTable ImportTable { get; set; }
+
+        /// <summary>
         /// Kliknięcie na komórkę tabeli
         /// </summary>
         /// <param name="sender"></param>
@@ -52,7 +58,7 @@ namespace DataSmoothing.Forms.AddSeries
                 }
 
                 cellMenu.ItemClicked += CellMenu_ItemClicked;
-                cellMenu.Show(this.dataGridView, new Point(e.X, e.Y));
+                cellMenu.Show(this.dataGridView, new Point(e.Location.X, e.Location.Y));
             }
         }
 
@@ -91,7 +97,7 @@ namespace DataSmoothing.Forms.AddSeries
                     menu.Items["RemColl"].Tag = e.ColumnIndex;
                 }
 
-                menu.Show(this.dataGridView, new Point(e.X, e.Y));
+                menu.Show(this.dataGridView, new Point(e.Location.X, e.Location.Y));
                 menu.ItemClicked += Menu_ItemClicked;
             }
         }
@@ -126,11 +132,11 @@ namespace DataSmoothing.Forms.AddSeries
         }
 
         /// <summary>
-        /// Nazywanie zmiennych.kolumn
+        /// Nazywanie zmiennych kolumn
         /// </summary>
         /// <param name="columnIndex">Index kolumny</param>
         /// <param name="variableName">Nazwa zmiennej</param>
-        private void NameVariable(int columnIndex = -1, string variableName = "", DataRow row = null)
+        private void NameVariable(int columnIndex = -1, string variableName = "")
         {
             if (columnIndex > -1 || variableName != "")
             {
@@ -141,53 +147,42 @@ namespace DataSmoothing.Forms.AddSeries
                 {
                     if (item.Text == this._dataFiles.Columns[columnIndex].ColumnName)
                     {
+                        for (int j = 0; j < this.ImportTable.Columns.Count; j++)
+                        {
+                            if (this.ImportTable.Columns[j].ColumnName == item.Text)
+                            {
+                                this.ImportTable.Columns[j].ColumnName = this._dataFiles.Columns[columnIndex].ColumnName;
+                            }
+                        }
+
                         this.varListView.Items[this.varListView.Items.IndexOf(item)].Text = columnNameEditor.GetName;
-                        this._dataFiles.Columns[columnIndex].ColumnName = columnNameEditor.GetName;
                         break;
                     }
                 }
-            }
 
-            if (row != null)
-            {
-                foreach (ListViewItem item in this.varListView.Items)
-                {
-                    for (int i = 0; i < this.dataGridView.Columns.Count; i++)
-                    {
-                        if (item.Text == this._dataFiles.Columns[i].ColumnName)
-                        {
-                            this.varListView.Items[this.varListView.Items.IndexOf(item)].Text = row[i].ToString();
-                            this._dataFiles.Columns[columnIndex].ColumnName = row[i].ToString();
-                            break;
-                        }
-                    }
-                }
+                this._dataFiles.Columns[columnIndex].ColumnName = columnNameEditor.GetName;
             }
         }
 
+        /// <summary>
+        /// Nazywanie zmiennych kolumn
+        /// </summary>
+        /// <param name="rowIndex">Index wiersza</param>
+        /// <param name="row">Wiersz danych</param>
         private void NameVariable(int rowIndex, DataRow row)
         {
             if (row != null)
             {
                 string[] _names = new string[this._dataFiles.Columns.Count];
+                string[] _columns = new string[this._dataFiles.Columns.Count];
 
                 for (int i = 0; i < this._dataFiles.Columns.Count; i++)
                 {
                     _names[i] = row[i].ToString();
+                    _columns[i] = this._dataFiles.Columns[i].ColumnName;
                 }
 
                 this._dataFiles.Rows.RemoveAt(rowIndex);
-                foreach (ListViewItem item in this.varListView.Items)
-                {
-                    for (int i = 0; i < this.dataGridView.Columns.Count; i++)
-                    {
-                        if (item.Text == this._dataFiles.Columns[i].ColumnName)
-                        {
-                            this.varListView.Items[this.varListView.Items.IndexOf(item)].Text = _names[i];
-                            break;
-                        }
-                    }
-                }
 
                 for (int i = 0; i < this.dataGridView.Columns.Count; i++)
                 {
@@ -197,10 +192,64 @@ namespace DataSmoothing.Forms.AddSeries
                     }
                     catch (Exception e)
                     {
-                        this._dataFiles.Columns[i].ColumnName = _names[i] + "2";
+                        this._dataFiles.Columns[i].ColumnName = _names[i] + i;
+                    }
+                }
+
+                foreach (ListViewItem item in this.varListView.Items)
+                {
+                    for (int i = 0; i < this.dataGridView.Columns.Count; i++)
+                    {
+                        if (item.Text == _columns[i])
+                        {
+                            for (int j = 0; j < this.ImportTable.Columns.Count; j++)
+                            {
+                                if (this.ImportTable.Columns[j].ColumnName == item.Text)
+                                {
+                                    this.ImportTable.Columns[j].ColumnName = this._dataFiles.Columns[i].ColumnName;
+                                }
+                            }
+
+                            this.varListView.Items[this.varListView.Items.IndexOf(item)].Text = this._dataFiles.Columns[i].ColumnName;
+                            break;
+                        }
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Nazywanie zmiennych
+        /// </summary>
+        /// <param name="Index">Index w liście zmoiennych</param>
+        private void NewNameVariable(int Index)
+        {
+            ColumnNameEditor columnNameEditor = new ColumnNameEditor("Nadaj nazwę zmiennej");
+            columnNameEditor.ShowDialog();
+            string _name = columnNameEditor.GetName;
+
+            foreach (DataColumn column in this._dataFiles.Columns)
+            {
+                if (column.ColumnName == this.varListView.Items[Index].Text)
+                {
+                    this._dataFiles.Columns[this._dataFiles.Columns.IndexOf(column)].ColumnName = _name;
+                    break; 
+                }
+            }
+
+            if (this.ImportTable != null)
+            {
+                foreach (DataColumn column in this.ImportTable.Columns)
+                {
+                    if (column.ColumnName == this.varListView.Items[Index].Text)
+                    {
+                        this.ImportTable.Columns[this.ImportTable.Columns.IndexOf(column)].ColumnName = _name;
+                        break;
+                    }
+                }
+            }
+
+            this.varListView.Items[Index].Text = _name;
         }
 
         /// <summary>
@@ -223,6 +272,34 @@ namespace DataSmoothing.Forms.AddSeries
             if (!f)
             {
                 this.varListView.Items.Add(new ListViewItem(tag));
+
+                if (this.ImportTable == null)
+                {
+                    this.ImportTable = new DataTable();
+                }
+
+                if (this.ImportTable.Columns.Count > 0)
+                {
+                    this.ImportTable.Columns.Add(tag);
+
+                    for (int i = 0; i < this.ImportTable.Rows.Count; i++)
+                    {
+                        this.ImportTable.Rows[i][tag] = this._dataFiles.Rows[i][tag];
+                    }
+                }
+                else
+                {
+                    this.ImportTable.Columns.Add(tag);
+
+                    DataRow row = this.ImportTable.NewRow();
+
+                    foreach (DataRow r in this._dataFiles.Rows)
+                    {
+                        row[tag] = r[tag];
+                    }
+
+                    this.ImportTable.Rows.Add(row);
+                }
             }
         }
 
@@ -344,6 +421,53 @@ namespace DataSmoothing.Forms.AddSeries
                 this._dataFiles.Clear();
                 this._dataFiles.Columns.Clear();
                 this.PrepareData(this._filePath.Last());
+            }
+        }
+
+        /// <summary>
+        /// Menu kontekstowe dla listy zmiennych
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void varListView_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                int position = this.varListView.HitTest(e.X, e.Y).Item.Index;
+
+                ContextMenuStrip variableMenu = new ContextMenuStrip();
+                variableMenu.Items.Add("Nazwij zmienną").Name = "NameVar";
+                variableMenu.Items["NameVar"].Tag = position;
+                variableMenu.Items.Add("Usuń zmienną").Name = "RemVar";
+                variableMenu.Items["RemVar"].Tag = position;
+
+                variableMenu.ItemClicked += VariableMenu_ItemClicked;
+                variableMenu.Show(this.varListView, new Point(e.Location.X, e.Location.Y));
+            }
+        }
+
+        private void VariableMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            switch (e.ClickedItem.Name)
+            {
+                case "NameVar":
+                    this.NewNameVariable(Convert.ToInt32(e.ClickedItem.Tag));
+                    break;
+                case "RemVar":
+                    if (this.ImportTable != null)
+                    {
+                        foreach (DataColumn column in this.ImportTable.Columns)
+                        {
+                            if (column.ColumnName == this.varListView.Items[Convert.ToInt32(e.ClickedItem.Tag.ToString())].Text)
+                            {
+                                this.ImportTable.Columns.Remove(column);
+                                break;
+                            }
+                        }
+                    }
+
+                    this.varListView.Items.Remove(this.varListView.Items[Convert.ToInt32(e.ClickedItem.Tag)]);
+                    break;
             }
         }
     }

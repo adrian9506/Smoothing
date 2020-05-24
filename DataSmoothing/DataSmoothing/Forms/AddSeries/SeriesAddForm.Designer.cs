@@ -73,7 +73,7 @@
             this.dataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView.Location = new System.Drawing.Point(241, 41);
             this.dataGridView.Name = "dataGridView";
-            this.dataGridView.Size = new System.Drawing.Size(426, 397);
+            this.dataGridView.Size = new System.Drawing.Size(544, 397);
             this.dataGridView.TabIndex = 4;
             // 
             // delimiterComboBox
@@ -97,11 +97,12 @@
             // varListView
             // 
             this.varListView.HideSelection = false;
-            this.varListView.Location = new System.Drawing.Point(673, 41);
+            this.varListView.Location = new System.Drawing.Point(791, 41);
             this.varListView.Name = "varListView";
-            this.varListView.Size = new System.Drawing.Size(223, 397);
+            this.varListView.Size = new System.Drawing.Size(105, 397);
             this.varListView.TabIndex = 7;
             this.varListView.UseCompatibleStateImageBehavior = false;
+            this.varListView.MouseClick += new System.Windows.Forms.MouseEventHandler(this.varListView_MouseClick);
             // 
             // SeriesAddForm
             // 
